@@ -16,6 +16,7 @@ To run the helper script:
 ./run-test
 ```
 
+To run only the tests:
 ```bash
 mvn clean test -DbaseUrl=http://localhost:90/qa-catalogue/
 ```

@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+echo "Prepare data"
+if [[ ! -d data ]]; then
+  mkdir data
+fi
+cd data
+if [[ ! -f natl_bibliography-2016-2021-marc.xml.gz ]]; then
+  wget https://dati.lnb.lv/files/natl_bibliography-2016-2021-marc.zip
+  unzip natl_bibliography-2016-2021-marc.zip
+  rm natl_bibliography-2016-2021-marc.zip
+  gzip natl_bibliography-2016-2021-marc.xml
+fi
+cd ..
+
+echo "Clean docker"
+docker stop $(docker ps --filter name=metadata-qa-marc -q)
+docker rm $(docker ps -a --filter name=metadata-qa-marc -q)
+docker rmi $(docker images metadata-qa-marc -q)
+docker builder prune -a -f
+
+echo "Build docker image"
+mkdir tmp
+cd tmp
+git clone https://github.com/pkiraly/qa-catalogue.git
+cd qa-catalogue
+mvn clean package
+docker compose -f docker-compose.yml build app
+cd ../..
+rm -rf tmp
+
+echo "Start docker container"
+docker run \
+  -d \
+  -v data:/opt/qa-catalogue/marc \
+  -p 8983:8983 -p 90:80 \
+  --name metadata-qa-marc \
+  metadata-qa-marc
+
+# docker cp data/natl_bibliography-2016-2021-marc.xml.gz metadata-qa-marc:/opt/qa-catalogue/marc
+
+echo "run analyses"
+docker exec \
+  -t -i metadata-qa-marc \
+  ./metadata-qa.sh \
+  --params "--marcVersion GENT --marcxml" \
+  --mask '*marc.xml.gz' \
+  --catalogue lnb \
+  all
+
+mvn clean test -DbaseUrl=http://localhost:90/qa-catalogue/

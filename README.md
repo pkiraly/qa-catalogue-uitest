@@ -28,3 +28,5 @@ Prerequisites a QA catalogue development environment, so
 * Java 11
 * Maven
 * Git
+
+Note: it was only tested under Ubuntu Linux.

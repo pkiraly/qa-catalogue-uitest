@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.gwdg.metadataqa</groupId>
+  <artifactId>qa-catalogue-uitest</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>QA catalogueUI tests</name>
+  <url>http://pkiraly.github.io</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
+    <maven.surefire.plugin>2.22.2</maven.surefire.plugin>
+    <maven.failsafe.plugin>${maven.surefire.plugin}</maven.failsafe.plugin>
+    <webdrivermanager.version>3.8.1</webdrivermanager.version>
+    <selenium.java>3.141.59</selenium.java>
+    <selenium.jupiter>3.3.4</selenium.jupiter>
+    <junit.jupiter.version>5.6.1</junit.jupiter.version>
+  </properties>
+
+  <dependencies>
+    <!-- WebDriver Manager - https://github.com/bonigarcia/webdrivermanager
+        Make sure an up to date version of WebDriverManager is used if you receive an error about ChromeDriver not being
+        able to handle the version of Chrome on your machine "This version of ChromeDriver only supports ..." -->
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <version>${webdrivermanager.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Selenium WebDriver dependency - https://www.selenium.dev/maven/ -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.java}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- JUnit Jupiter is essentially JUnit 5 - https://junit.org/junit5/docs/current/user-guide/ -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- JUnit 5 annotations to configure drivers - https://github.com/bonigarcia/selenium-jupiter -->
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>selenium-jupiter</artifactId>
+      <version>${selenium.jupiter}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.compiler.plugin}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven.surefire.plugin}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven.failsafe.plugin}</version>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

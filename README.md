@@ -1,6 +1,6 @@
 # Web UI tests for QA catalogue
 
-This repository contains tests against the web UI of [QA catalogue](https://github.com/pkiraly/qa-catalogue). These tests are written using the Java implementation of the Selenium WebDriver framework. The tests expects the analysis of the Latvian National Library's sample MARC data set, which is openly available under CCO license. The prerequisite of the tests is to set up the QA catalogue and run all analyses of this data set.
+This repository contains tests against the web UI of [QA catalogue](https://github.com/pkiraly/qa-catalogue). These tests are written using the Java implementation of the [Selenium](https://www.selenium.dev/) WebDriver framework. The tests expects the analysis of the Latvian National Library's ([Latvijas Nacionālā bibliotēka](https://lnb.lv/)) sample MARC data set, which is openly available under CCO license. The prerequisite of the tests is to set up the QA catalogue and run all analyses of this data set.
 
 There is a helper script, which 
 * downloads the dataset

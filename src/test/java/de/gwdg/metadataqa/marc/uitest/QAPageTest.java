@@ -25,9 +25,9 @@ public class QAPageTest {
             baseUrl = "http://localhost:90/qa-catalogue/";
         }
 
-        if (System.getProperties().containsKey("config")) {
+        if (System.getProperties().containsKey("catalogue-config")) {
             try {
-                catalogue = CatalogueFactory.readConfig(System.getProperty("config"));
+                catalogue = CatalogueFactory.readConfig(System.getProperty("catalogue-config"));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }

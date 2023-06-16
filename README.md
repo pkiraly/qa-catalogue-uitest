@@ -18,11 +18,17 @@ To run the helper script:
 
 To run only the tests:
 ```bash
-mvn clean test -DbaseUrl=http://localhost:90/qa-catalogue/
+mvn clean test -DbaseUrl=http://localhost:90/qa-catalogue/ -Dcatalogue-config=catalogues/lnb.json
 ```
 
 Parameters:
 * `baseUrl`: the URL of the running QA catalogue instance
+* `catalogue-config`: a JSON file containing information about a given catalogue. These information will be used as
+     expected values in tests. We have a sample configuration file in the `catalogues` directory which fit to the
+     actual Latvian data. The keys in this configuration file:
+  * `recordCount`: the number of records in the data set
+  * `libraryName`: the name of the library
+  * `libraryUrl`: the URL of the library web site
 
 Prerequisites a QA catalogue development environment, so
 * Java 11

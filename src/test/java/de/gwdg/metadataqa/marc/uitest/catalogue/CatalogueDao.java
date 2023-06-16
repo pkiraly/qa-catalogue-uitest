@@ -1,9 +1,13 @@
 package de.gwdg.metadataqa.marc.uitest.catalogue;
 
+import java.util.List;
+import java.util.Map;
+
 public class CatalogueDao implements Catalogue {
     private int recordCount;
     private String libraryName;
     private String libraryUrl;
+    private Completeness completeness;
 
     @Override
     public int getRecordCount() {
@@ -30,5 +34,14 @@ public class CatalogueDao implements Catalogue {
 
     public void setLibraryUrl(String libraryUrl) {
         this.libraryUrl = libraryUrl;
+    }
+
+    @Override
+    public Completeness getCompleteness() {
+        return completeness;
+    }
+
+    public void setCompleteness(Completeness completeness) {
+        this.completeness = completeness;
     }
 }

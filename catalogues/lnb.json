@@ -1,5 +1,11 @@
 {
 	"recordCount": 18585,
 	"libraryName": "Latvijas Nacionālā bibliotēka",
-	"libraryUrl": "https://lnb.lv/"
+	"libraryUrl": "https://lnb.lv/",
+	"completeness": {
+		"fieldGroups": [
+			{"id": 1, "label": "Control Fields", "count": 18585},
+			{"id": 3, "label": "Main Entry", "count": 15476}
+		]
+	}
 }

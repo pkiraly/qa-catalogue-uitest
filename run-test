@@ -48,4 +48,6 @@ docker exec \
   --catalogue lnb \
   all
 
-mvn clean test -DbaseUrl=http://localhost:90/qa-catalogue/
+mvn clean test \
+  -DbaseUrl=http://localhost:90/qa-catalogue/ \
+  -Dcatalogue-config=catalogues/lnb.json

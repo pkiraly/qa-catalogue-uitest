@@ -1,5 +1,6 @@
 package de.gwdg.metadataqa.marc.uitest;
 
+import de.gwdg.metadataqa.marc.uitest.catalogue.FieldGroup;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -41,15 +42,15 @@ public class CompletenessTest extends QAPageTest {
 
         WebElement groupLabel;
         WebElement groupCount;
-        groupLabel = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[3]/table/tbody/tr[2]/td[2]"));
-        assertEquals("Control Fields", groupLabel.getText());
-        groupCount = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[3]/table/tbody/tr[2]/td[4]"));
-        assertEquals("18,585", groupCount.getText());
-
-        groupLabel = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[3]/table/tbody/tr[4]/td[2]"));
-        assertEquals("Main Entry", groupLabel.getText());
-        groupCount = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[3]/table/tbody/tr[4]/td[4]"));
-        assertEquals("15,476", groupCount.getText());
+        if (catalogue != null) {
+            for (FieldGroup fieldGroup : catalogue.getCompleteness().getFieldGroups()) {
+                String row = "div#completeness-group-table table tbody tr:nth-child(" + (fieldGroup.getId() + 1) + ")";
+                groupLabel = driver.findElement(By.cssSelector(row + " td:nth-child(2)"));
+                groupCount = driver.findElement(By.cssSelector(row + " td:nth-child(4)"));
+                assertEquals(fieldGroup.getLabel(), groupLabel.getText());
+                assertEquals(fieldGroup.getCount(), Integer.parseInt(groupCount.getText().replaceAll("\\D", "")));
+            }
+        }
     }
 
     @Test

@@ -29,6 +29,11 @@ Parameters:
   * `recordCount`: the number of records in the data set
   * `libraryName`: the name of the library
   * `libraryUrl`: the URL of the library web site
+  * `completeness`: data in the COmpleteness tab
+    * `fieldGroups`: list of rows in the field groups table
+      * `id`: the count number of the row
+      * `label`: the label of field group
+      * `count` (integer): the integer value of the record count
 
 Prerequisites a QA catalogue development environment, so
 * Java 11

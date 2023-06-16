@@ -7,5 +7,11 @@
 			{"id": 1, "label": "Control Fields", "count": 18585},
 			{"id": 3, "label": "Main Entry", "count": 15476}
 		]
+	},
+	"validation": {
+		"recordsWithoutIssues": {
+			"plain": "0 (0.00%)",
+			"exclude": "3,331 (17.92%)"
+		}
 	}
 }

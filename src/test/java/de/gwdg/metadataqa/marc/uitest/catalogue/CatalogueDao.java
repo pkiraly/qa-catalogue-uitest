@@ -9,6 +9,8 @@ public class CatalogueDao implements Catalogue {
     private String libraryUrl;
     private Completeness completeness;
 
+    private Validation validation;
+
     @Override
     public int getRecordCount() {
         return recordCount;
@@ -43,5 +45,13 @@ public class CatalogueDao implements Catalogue {
 
     public void setCompleteness(Completeness completeness) {
         this.completeness = completeness;
+    }
+
+    public Validation getValidation() {
+        return validation;
+    }
+
+    public void setValidation(Validation validation) {
+        this.validation = validation;
     }
 }

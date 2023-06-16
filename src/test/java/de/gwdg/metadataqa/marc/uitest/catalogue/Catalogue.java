@@ -9,4 +9,5 @@ public interface Catalogue {
 
     String getLibraryUrl();
     Completeness getCompleteness();
+    Validation getValidation();
 }

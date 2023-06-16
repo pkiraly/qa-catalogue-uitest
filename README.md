@@ -25,15 +25,21 @@ Parameters:
 * `baseUrl`: the URL of the running QA catalogue instance
 * `catalogue-config`: a JSON file containing information about a given catalogue. These information will be used as
      expected values in tests. We have a sample configuration file in the `catalogues` directory which fit to the
-     actual Latvian data. The keys in this configuration file:
-  * `recordCount` (integer): the number of records in the data set
-  * `libraryName`: the name of the library
-  * `libraryUrl`: the URL of the library's web site
-  * `completeness`: data in the Completeness tab
-    * `fieldGroups`: list of rows in the field groups table
-      * `id`: the count number of the row
-      * `label`: the label of field group
-      * `count` (integer): the integer value of the record count
+     actual Latvian data.
+
+The keys in the configuration file:
+* `recordCount` (integer): the number of records in the data set
+* `libraryName`: the name of the library
+* `libraryUrl`: the URL of the library's web site
+* `completeness`: data in the Completeness tab
+  * `fieldGroups`: list of rows in the field groups table
+    * `id`: the count number of the row
+    * `label`: the label of field group
+    * `count` (integer): the integer value of the record count
+* `validation`: data in the validation tab
+  * `recordsWithoutIssues`: the content of the general bars
+    * `plain`: records without issues in the first bar
+    * `exclude`: records without issues in the second bar
 
 Prerequisites a QA catalogue development environment, so
 * Java 11

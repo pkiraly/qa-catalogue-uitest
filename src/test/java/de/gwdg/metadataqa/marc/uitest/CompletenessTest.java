@@ -1,6 +1,5 @@
 package de.gwdg.metadataqa.marc.uitest;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -11,12 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CompletenessTest extends QAPageTest {
 
     @Test
-    public void testNumeric() {
+    public void testLabels() {
         driver.get(baseUrl + "?tab=completeness&lang=en");
-
-        // Find the text input element by its name
-        WebElement counter = driver.findElement(By.cssSelector(".header-info strong"));
-        assertEquals("18585", counter.getText().replaceAll("\\D", ""));
 
         WebElement definition = driver.findElement(By.cssSelector(".metric-definition"));
         assertTrue(definition.getText().startsWith("Which fields and subfields occur how often in which records"));
@@ -24,11 +19,20 @@ public class CompletenessTest extends QAPageTest {
         WebElement docType = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[1]"));
         assertEquals("by document types: all", docType.getText());
 
-        // Enter something to search for
-        // element.sendKeys("Cheese!");
+        if (catalogue != null) {
+            WebElement nameEl = driver.findElement(By.cssSelector("div.col-md-9 a"));
+            assertEquals(catalogue.getLibraryName(), nameEl.getText());
+            assertEquals(catalogue.getLibraryUrl(), nameEl.getAttribute("href"));
+        }
+    }
+    @Test
+    public void testCount() {
+        driver.get(baseUrl + "?tab=completeness&lang=en");
 
-        // Now submit the form
-        // element.submit();
+        if (catalogue != null) {
+            WebElement counter = driver.findElement(By.cssSelector(".header-info strong"));
+            assertEquals(catalogue.getRecordCount(), Integer.parseInt(counter.getText().replaceAll("\\D", "")));
+        }
     }
 
     @Test
@@ -52,7 +56,6 @@ public class CompletenessTest extends QAPageTest {
     public void testTranslation() {
         driver.get(baseUrl + "?tab=completeness&lang=de");
 
-        // Find the text input element by its name
         WebElement counter = driver.findElement(By.cssSelector(".header-info strong"));
         assertEquals("18585", counter.getText().replaceAll("\\D", ""));
 
@@ -61,17 +64,6 @@ public class CompletenessTest extends QAPageTest {
 
         WebElement docType = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[1]"));
         assertEquals("Dokumenttyp: all", docType.getText());
-
-
-        // Enter something to search for
-        // element.sendKeys("Cheese!");
-
-        // Now submit the form
-        // element.submit();
     }
 
-    @AfterEach
-    public void closeBrowser(){
-        driver.close();
-    }
 }

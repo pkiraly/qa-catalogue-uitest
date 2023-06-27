@@ -56,8 +56,6 @@ docker run \
   --name metadata-qa-marc \
   metadata-qa-marc
 
-exit
-
 # docker cp data/natl_bibliography-2016-2021-marc.xml.gz metadata-qa-marc:/opt/qa-catalogue/marc
 
 echo "run analyses"

@@ -4,6 +4,25 @@ SOLR_VERSION=8.11.1
 
 BASE_DIR=$(realpath .)
 
+options=$(getopt -o sw --long with-solr,with-main-web -- "$@")
+
+eval set -- "$options"
+
+WITH_SOLR=0
+WITH_MAIN_WEB=0
+while true; do
+    case "$1" in
+    -s|--with-solr) WITH_SOLR=1 ;;
+    -w|--with-main-web) WITH_MAIN_WEB=1 ;;
+    --)
+        shift
+        break
+        ;;
+    esac
+    shift
+done
+
+echo "params: WITH_SOLR=${WITH_SOLR}, WITH_MAIN_WEB=${WITH_MAIN_WEB}"
 echo "Prepare data"
 if [[ ! -d data ]]; then
   mkdir data
@@ -33,16 +52,17 @@ git clone https://github.com/pkiraly/qa-catalogue.git
 cd qa-catalogue
 mvn clean package
 DOCKER_BUILD_AGRS=
-if [ "$1" = "--with-solr" ]; then
+if [ "${WITH_SOLR}" = 1 ]; then
   if [ ! -f solr-${SOLR_VERSION}.zip ]; then
     cp ${BASE_DIR}/data/solr-${SOLR_VERSION}.zip .
-    # echo "BASE_DIR is " ${BASE_DIR}
-    # echo "I am at " $(pwd)
-    # echo "ln -s ${BASE_DIR}/data/solr-${SOLR_VERSION}.zip"
-    # ln -s ${BASE_DIR}/data/solr-${SOLR_VERSION}.zip solr-${SOLR_VERSION}.zip
   fi
-  DOCKER_BUILD_AGRS="--build-arg SOLR_INSTALL_SOURCE=solr-${SOLR_VERSION}.zip"
+  DOCKER_BUILD_AGRS="${DOCKER_BUILD_AGRS} --build-arg SOLR_INSTALL_SOURCE=solr-${SOLR_VERSION}.zip"
 fi
+if [ "${WITH_MAIN_WEB}" = 1 ]; then
+  DOCKER_BUILD_AGRS="${DOCKER_BUILD_AGRS} --build-arg QA_CATALOGUE_WEB_VERSION=main"
+fi
+echo "DOCKER_BUILD_AGRS=${DOCKER_BUILD_AGRS}"
+
 docker compose -f docker-compose.yml build app $DOCKER_BUILD_AGRS
 
 cd ../..
@@ -58,15 +78,38 @@ docker run \
 
 # docker cp data/natl_bibliography-2016-2021-marc.xml.gz metadata-qa-marc:/opt/qa-catalogue/marc
 
-echo "run analyses"
+echo "run MARC analyses"
 docker exec \
   -t -i metadata-qa-marc \
-  ./metadata-qa.sh \
+  ./qa-catalogue \
   --params "--marcVersion GENT --marcxml" \
   --mask '*marc.xml.gz' \
   --catalogue lnb \
+  --name "" \
+  --input-dir "input" \
+  --web-config \
   all
 
 mvn clean test \
   -DbaseUrl=http://localhost:90/qa-catalogue/ \
   -Dcatalogue-config=catalogues/lnb.json
+
+echo "cleanup"
+docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf marc/_output/qa-catalogue/*'
+docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf marc/_reports/qa-catalogue/*'
+
+echo "run PICA analyses"
+docker exec \
+  -t -i metadata-qa-marc \
+  ./qa-catalogue \
+  --schema PICA \
+  --params "--schemaType PICA --marcFormat PICA_NORMALIZED --emptyLargeCollectors --groupBy "001@\$\0" --groupListFile marc/k10plus-libraries-by-unique-iln.txt --ignorableFields 001@,001E,001L,001U,001U,001X,001X,002V,003C,003G,003Z,008G,017N,020F,027D,031B,037I,039V,042@,046G,046T,101@,101E,101U,102D,201E,201U,202D,1...,2... --allowableRecords base64:MDAyQC4wICF+ICJeTCIgJiYgMDAyQC4wICF+ICJeLi5baWt0Tl0iICYmICgwMDJALjAgIX4gIl4udiIgfHwgMDIxQS5hPykK" \
+  --mask 'pica-with-holdings-info-1K.dat' \
+  --catalogue K10plus_pica_grouped \
+  --input-dir "input" \
+  --web-config \
+  all
+
+mvn clean test \
+  -DbaseUrl=http://localhost:90/qa-catalogue/ \
+  -Dcatalogue-config=catalogues/k10plus.json

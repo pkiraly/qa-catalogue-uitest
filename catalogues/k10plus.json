@@ -1,0 +1,22 @@
+{
+	"recordCount": 1000,
+	"libraryName": "K10plus-Verbundkatalog (PICA)",
+	"libraryUrl": "https://opac.k10plus.de/",
+	"completeness": {
+		"fieldGroups": [
+			{"id": 0, "label": "PICA+ bibliographic description", "count": 1000},
+			{"id": 1, "label": "unknown origin", "count": 3}
+		],
+		"docTypes": {
+			"en": "by document types: all · Druckschriften (einschließlich Bildbänden) · Mikroform · Tonträger, Videodatenträger, Bildliche Darstellungen · Medienkombination",
+			"de": "Dokumenttyp: all · Druckschriften (einschließlich Bildbänden) · Mikroform · Tonträger, Videodatenträger, Bildliche Darstellungen · Medienkombination"
+		}
+	},
+	"validation": {
+		"definition": "Conformity with the bibliographic metadata scheme.",
+		"recordsWithoutIssues": {
+			"plain": "337 (33.70%)",
+			"exclude": "337 (33.70%)"
+		}
+	}
+}

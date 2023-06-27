@@ -9,14 +9,17 @@ import java.io.IOException;
 public class CatalogueFactory {
 
     public static Catalogue readConfig(String fileName) throws FileNotFoundException {
+        System.err.println("readConfig() " + fileName);
         ObjectMapper objectMapper = new ObjectMapper();
         File file = new File(fileName);
 
         try {
             CatalogueDao catalogue = objectMapper.readValue(file, CatalogueDao.class);
             return catalogue;
-        } catch (IOException var6) {
-            throw new FileNotFoundException(var6.getMessage());
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            throw new FileNotFoundException(e.getMessage());
         }
     }
 

@@ -17,10 +17,10 @@ public class CompletenessTest extends QAPageTest {
         WebElement definition = driver.findElement(By.cssSelector(".metric-definition"));
         assertTrue(definition.getText().startsWith("Which fields and subfields occur how often in which records"));
 
-        WebElement docType = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[1]"));
-        assertEquals("by document types: all · Books · Continuing Resources · Computer Files", docType.getText());
-
         if (catalogue != null) {
+            WebElement docTypes = driver.findElement(By.id("document-type-selector"));
+            assertEquals(catalogue.getCompleteness().getDocTypes().getEn(), docTypes.getText());
+
             WebElement nameEl = driver.findElement(By.cssSelector("div.col-md-9 a"));
             assertEquals(catalogue.getLibraryName(), nameEl.getText());
             assertEquals(catalogue.getLibraryUrl(), nameEl.getAttribute("href"));
@@ -58,13 +58,14 @@ public class CompletenessTest extends QAPageTest {
         driver.get(baseUrl + "?tab=completeness&lang=de");
 
         WebElement counter = driver.findElement(By.cssSelector(".header-info strong"));
-        assertEquals("18585", counter.getText().replaceAll("\\D", ""));
+        assertEquals(catalogue.getRecordCount(), Integer.parseInt(counter.getText().replaceAll("\\D", "")));
 
         WebElement definition = driver.findElement(By.cssSelector(".metric-definition"));
         assertTrue(definition.getText().startsWith("Alle Felder und Unterfelder mit der jeweiligen Anzahl und dem Anteil ihres Vorkommens"));
 
-        WebElement docType = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[1]"));
-        assertEquals("Dokumenttyp: all · Books · Continuing Resources · Computer Files", docType.getText());
+        if (catalogue != null) {
+            WebElement docTypes = driver.findElement(By.id("document-type-selector"));
+            assertEquals(catalogue.getCompleteness().getDocTypes().getDe(), docTypes.getText());
+        }
     }
-
 }

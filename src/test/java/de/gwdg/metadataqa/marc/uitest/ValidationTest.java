@@ -16,10 +16,10 @@ public class ValidationTest extends QAPageTest {
         driver.get(baseUrl + tab);
 
         WebElement counter = driver.findElement(By.cssSelector(".header-info strong"));
-        assertEquals("18585", counter.getText().replaceAll("\\D", ""));
+        assertEquals(catalogue.getRecordCount(), Integer.parseInt(counter.getText().replaceAll("\\D", "")));
 
         WebElement definition = driver.findElement(By.cssSelector(".metric-definition"));
-        assertTrue(definition.getText().startsWith("Conformity with the bibliographic metadata scheme (MARC21 scheme)."));
+        assertTrue(definition.getText().startsWith(catalogue.getValidation().getDefinition()));
     }
 
     @Test

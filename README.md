@@ -47,3 +47,28 @@ Prerequisites a QA catalogue development environment, so
 * Git
 
 Note: it was only tested under Ubuntu Linux.
+
+Preparation:
+- You can improve the speed of docker image building if you download Solr to the `data` directory. If you have it, you 
+  run the test as `./run-tests --with-solr`.
+- To test PICA, you should download a small set of PICA records to the `data` directory. Then
+
+```bash
+# clean the log and analysis result related to MARC anaysis
+docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf marc/_output/qa-catalogue/*'
+docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf marc/_reports/qa-catalogue/*'
+
+# upload PICA records and library list 
+docker cp data/pica-with-holdings-info-1K.dat metadata-qa-marc:/opt/qa-catalogue/marc
+docker cp data/k10plus-libraries-by-unique-iln.txt metadata-qa-marc:/opt/qa-catalogue/marc
+
+echo "run analyses"
+docker exec \
+  -t -i metadata-qa-marc \
+  ./metadata-qa.sh \
+  --schema PICA \
+  --params "--schemaType PICA --marcFormat PICA_NORMALIZED --emptyLargeCollectors --groupBy "001@\$\0" --groupListFile marc/k10plus-libraries-by-unique-iln.txt --ignorableFields 001@,001E,001L,001U,001U,001X,001X,002V,003C,003G,003Z,008G,017N,020F,027D,031B,037I,039V,042@,046G,046T,101@,101E,101U,102D,201E,201U,202D,1...,2... --allowableRecords base64:MDAyQC4wICF+ICJeTCIgJiYgMDAyQC4wICF+ICJeLi5baWt0Tl0iICYmICgwMDJALjAgIX4gIl4udiIgfHwgMDIxQS5hPykK" \
+  --mask 'pica-with-holdings-info-1K.dat' \
+  --catalogue K10plus_pica_grouped \
+  all
+```

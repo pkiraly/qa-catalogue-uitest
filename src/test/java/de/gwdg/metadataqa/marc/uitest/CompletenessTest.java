@@ -18,7 +18,7 @@ public class CompletenessTest extends QAPageTest {
         assertTrue(definition.getText().startsWith("Which fields and subfields occur how often in which records"));
 
         WebElement docType = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[1]"));
-        assertEquals("by document types: all", docType.getText());
+        assertEquals("by document types: all · Books · Continuing Resources · Computer Files", docType.getText());
 
         if (catalogue != null) {
             WebElement nameEl = driver.findElement(By.cssSelector("div.col-md-9 a"));
@@ -64,7 +64,7 @@ public class CompletenessTest extends QAPageTest {
         assertTrue(definition.getText().startsWith("Alle Felder und Unterfelder mit der jeweiligen Anzahl und dem Anteil ihres Vorkommens"));
 
         WebElement docType = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[1]"));
-        assertEquals("Dokumenttyp: all", docType.getText());
+        assertEquals("Dokumenttyp: all · Books · Continuing Resources · Computer Files", docType.getText());
     }
 
 }

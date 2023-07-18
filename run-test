@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#
+#------------------------------------------
+# -s,--with-solr copy Solr from local copy
+# -w,--with-main-web use the main branch of the web interface instead of a defined release
+#------------------------------------------
 
 SOLR_VERSION=8.11.1
 
@@ -76,7 +81,8 @@ docker run \
   --name metadata-qa-marc \
   metadata-qa-marc
 
-# docker cp data/natl_bibliography-2016-2021-marc.xml.gz metadata-qa-marc:/opt/qa-catalogue/marc
+docker cp data/natl_bibliography-2016-2021-marc.xml.gz metadata-qa-marc:/opt/qa-catalogue/marc/input
+docker cp data/pica-with-holdings-info-1K.dat metadata-qa-marc:/opt/qa-catalogue/marc/input
 
 echo "run MARC analyses"
 docker exec \
@@ -87,7 +93,7 @@ docker exec \
   --catalogue lnb \
   --name "" \
   --input-dir "input" \
-  --web-config \
+  --web-config "/var/www/html/qa-catalogue/configuration.cnf" \
   all
 
 mvn clean test \
@@ -107,7 +113,7 @@ docker exec \
   --mask 'pica-with-holdings-info-1K.dat' \
   --catalogue K10plus_pica_grouped \
   --input-dir "input" \
-  --web-config \
+  --web-config "/var/www/html/qa-catalogue/configuration.cnf" \
   all
 
 mvn clean test \

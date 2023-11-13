@@ -46,7 +46,7 @@ public class CompletenessTest extends QAPageTest {
             for (FieldGroup fieldGroup : catalogue.getCompleteness().getFieldGroups()) {
                 String row = "div#completeness-group-table table tbody tr:nth-child(" + (fieldGroup.getId() + 1) + ")";
                 groupLabel = driver.findElement(By.cssSelector(row + " td:nth-child(2)"));
-                groupCount = driver.findElement(By.cssSelector(row + " td:nth-child(4)"));
+                groupCount = driver.findElement(By.cssSelector(row + " td:nth-child(6)"));
                 assertEquals(fieldGroup.getLabel(), groupLabel.getText());
                 assertEquals(fieldGroup.getCount(), Integer.parseInt(groupCount.getText().replaceAll("\\D", "")));
             }

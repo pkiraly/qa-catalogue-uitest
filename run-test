@@ -6,6 +6,7 @@
 #------------------------------------------
 
 SOLR_VERSION=8.11.1
+QA_CATALOGUE_VERSION=0.8.0-SNAPSHOT
 
 BASE_DIR=$(realpath .)
 
@@ -39,7 +40,7 @@ if [[ ! -f natl_bibliography-2016-2021-marc.xml.gz ]]; then
   rm natl_bibliography-2016-2021-marc.zip
   gzip natl_bibliography-2016-2021-marc.xml
 fi
-if [ ! -f solr-8.11.1.zip ]; then
+if [ ! -f solr-${SOLR_VERSION}.zip ]; then
   wget http://archive.apache.org/dist/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.zip
 fi
 cd ..
@@ -51,12 +52,14 @@ docker rmi $(docker images metadata-qa-marc -q)
 docker builder prune -a -f
 
 echo "Build docker image"
-mkdir tmp
+if [[ ! -d tmp ]]; then
+  mkdir tmp
+fi
 cd tmp
 git clone https://github.com/pkiraly/qa-catalogue.git
 cd qa-catalogue
 mvn clean package
-DOCKER_BUILD_AGRS=
+DOCKER_BUILD_AGRS="--build-arg QA_CATALOGUE_VERSION=${QA_CATALOGUE_VERSION}"
 if [ "${WITH_SOLR}" = 1 ]; then
   if [ ! -f solr-${SOLR_VERSION}.zip ]; then
     cp ${BASE_DIR}/data/solr-${SOLR_VERSION}.zip .

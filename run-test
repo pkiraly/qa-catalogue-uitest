@@ -3,6 +3,8 @@
 #------------------------------------------
 # -s,--with-solr copy Solr from local copy
 # -w,--with-main-web use the main branch of the web interface instead of a defined release
+# -d,--with-develop-web use the develop branch of the web interface instead of a defined release
+# -b,--with-build build the QA catalogue application and docker image (otherwise: pull image)
 #------------------------------------------
 
 SOLR_VERSION=8.11.1
@@ -10,16 +12,20 @@ QA_CATALOGUE_VERSION=0.8.0-SNAPSHOT
 
 BASE_DIR=$(realpath .)
 
-options=$(getopt -o sw --long with-solr,with-main-web -- "$@")
+options=$(getopt -o swdb --long with-solr,with-main-web,with-develop-web,with-build -- "$@")
 
 eval set -- "$options"
 
 WITH_SOLR=0
-WITH_MAIN_WEB=0
+WITH_MAIN_WEB=1
+WITH_DEVELOP_WEB=0
+WITH_BUILD=0
 while true; do
     case "$1" in
     -s|--with-solr) WITH_SOLR=1 ;;
     -w|--with-main-web) WITH_MAIN_WEB=1 ;;
+    -d|--with-develop-web) WITH_DEVELOP_WEB=1 ;;
+    -b|--with-build) WITH_BUILD=1 ;;
     --)
         shift
         break
@@ -28,7 +34,7 @@ while true; do
     shift
 done
 
-echo "params: WITH_SOLR=${WITH_SOLR}, WITH_MAIN_WEB=${WITH_MAIN_WEB}"
+echo "params: WITH_SOLR=${WITH_SOLR}, WITH_MAIN_WEB=${WITH_MAIN_WEB}, WITH_DEVELOP_WEB=${WITH_DEVELOP_WEB}"
 echo "Prepare data"
 if [[ ! -d data ]]; then
   mkdir data
@@ -49,40 +55,61 @@ echo "Clean docker"
 docker stop $(docker ps --filter name=metadata-qa-marc -q)
 docker rm $(docker ps -a --filter name=metadata-qa-marc -q)
 docker rmi $(docker images metadata-qa-marc -q)
+docker rmi $(docker image ls --filter reference=*/pkiraly/qa-catalogue* -q)
 docker builder prune -a -f
 
-echo "Build docker image"
+
 if [[ ! -d tmp ]]; then
   mkdir tmp
 fi
 cd tmp
-git clone https://github.com/pkiraly/qa-catalogue.git
-cd qa-catalogue
-mvn clean package
-DOCKER_BUILD_AGRS="--build-arg QA_CATALOGUE_VERSION=${QA_CATALOGUE_VERSION}"
-if [ "${WITH_SOLR}" = 1 ]; then
-  if [ ! -f solr-${SOLR_VERSION}.zip ]; then
-    cp ${BASE_DIR}/data/solr-${SOLR_VERSION}.zip .
+
+if [ "${WITH_BUILD}" = 1 ]; then
+  echo "Build docker image"
+  git clone https://github.com/pkiraly/qa-catalogue.git
+  cd qa-catalogue
+  mvn clean package
+  DOCKER_BUILD_AGRS="--build-arg QA_CATALOGUE_VERSION=${QA_CATALOGUE_VERSION}"
+  if [ "${WITH_SOLR}" = 1 ]; then
+    if [ ! -f solr-${SOLR_VERSION}.zip ]; then
+      cp ${BASE_DIR}/data/solr-${SOLR_VERSION}.zip .
+    fi
+    DOCKER_BUILD_AGRS="${DOCKER_BUILD_AGRS} --build-arg SOLR_INSTALL_SOURCE=solr-${SOLR_VERSION}.zip"
   fi
-  DOCKER_BUILD_AGRS="${DOCKER_BUILD_AGRS} --build-arg SOLR_INSTALL_SOURCE=solr-${SOLR_VERSION}.zip"
-fi
-if [ "${WITH_MAIN_WEB}" = 1 ]; then
-  DOCKER_BUILD_AGRS="${DOCKER_BUILD_AGRS} --build-arg QA_CATALOGUE_WEB_VERSION=main"
-fi
-echo "DOCKER_BUILD_AGRS=${DOCKER_BUILD_AGRS}"
+  if [ "${WITH_MAIN_WEB}" = 1 ]; then
+    DOCKER_BUILD_AGRS="${DOCKER_BUILD_AGRS} --build-arg QA_CATALOGUE_WEB_VERSION=main"
+  elif [ "${WITH_DEVELOP_WEB}" = 1 ]; then
+    DOCKER_BUILD_AGRS="${DOCKER_BUILD_AGRS} --build-arg QA_CATALOGUE_WEB_VERSION=develop"
+  fi
+  echo "DOCKER_BUILD_AGRS=${DOCKER_BUILD_AGRS}"
 
-docker compose -f docker-compose.yml build app $DOCKER_BUILD_AGRS
+  # docker compose -f docker-compose.yml build app $DOCKER_BUILD_AGRS
+  docker compose -f docker/build.yml build app $DOCKER_BUILD_AGRS
 
-cd ../..
+  echo "Start docker container"
+  docker run \
+    -d \
+    -v data:/opt/qa-catalogue/marc/input \
+    -p 8983:8983 -p 90:80 \
+    --name metadata-qa-marc \
+    metadata-qa-marc
+
+  cd ../..
+else
+  echo "Pull docker image"
+  echo $(pwd)
+  # docker pull ghcr.io/pkiraly/qa-catalogue:main
+  wget https://raw.githubusercontent.com/pkiraly/qa-catalogue/main/docker-compose.yml
+  IMAGE=ghcr.io/pkiraly/qa-catalogue:main WEBPORT=90 docker compose up -d
+  docker exec -ti metadata-qa-marc mkdir -p marc/input
+  cd ..
+  # mkdir docker
+  # cd docker
+  # wget https://raw.githubusercontent.com/pkiraly/qa-catalogue/main/docker/qa-catalogue
+  # chmod +x qa-catalogue
+  # cd ..
+fi
 rm -rf tmp
-
-echo "Start docker container"
-docker run \
-  -d \
-  -v data:/opt/qa-catalogue/marc/input \
-  -p 8983:8983 -p 90:80 \
-  --name metadata-qa-marc \
-  metadata-qa-marc
 
 docker cp data/natl_bibliography-2016-2021-marc.xml.gz metadata-qa-marc:/opt/qa-catalogue/marc/input
 docker cp data/pica-with-holdings-info-1K.dat metadata-qa-marc:/opt/qa-catalogue/marc/input
@@ -95,6 +122,7 @@ docker exec \
   --mask '*marc.xml.gz' \
   --catalogue lnb \
   --name "" \
+  --input "marc" \
   --input-dir "input" \
   --web-config "/var/www/html/qa-catalogue/configuration.cnf" \
   all
@@ -115,6 +143,7 @@ docker exec \
   --params "--schemaType PICA --marcFormat PICA_NORMALIZED --emptyLargeCollectors --groupBy "001@\$\0" --groupListFile marc/k10plus-libraries-by-unique-iln.txt --ignorableFields 001@,001E,001L,001U,001U,001X,001X,002V,003C,003G,003Z,008G,017N,020F,027D,031B,037I,039V,042@,046G,046T,101@,101E,101U,102D,201E,201U,202D,1...,2... --allowableRecords base64:MDAyQC4wICF+ICJeTCIgJiYgMDAyQC4wICF+ICJeLi5baWt0Tl0iICYmICgwMDJALjAgIX4gIl4udiIgfHwgMDIxQS5hPykK" \
   --mask 'pica-with-holdings-info-1K.dat' \
   --catalogue K10plus_pica_grouped \
+  --input "marc" \
   --input-dir "input" \
   --web-config "/var/www/html/qa-catalogue/configuration.cnf" \
   all

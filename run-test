@@ -109,7 +109,7 @@ else
   # chmod +x qa-catalogue
   # cd ..
 fi
-rm -rf tmp
+# rm -rf tmp
 
 docker cp data/natl_bibliography-2016-2021-marc.xml.gz metadata-qa-marc:/opt/qa-catalogue/marc/input
 docker cp data/pica-with-holdings-info-1K.dat metadata-qa-marc:/opt/qa-catalogue/marc/input
@@ -132,8 +132,8 @@ mvn clean test \
   -Dcatalogue-config=catalogues/lnb.json
 
 echo "cleanup"
-docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf marc/_output/qa-catalogue/*'
-docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf marc/_reports/qa-catalogue/*'
+docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf output/qa-catalogue/*'
+docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf logs/qa-catalogue/*'
 
 echo "run PICA analyses"
 docker exec \

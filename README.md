@@ -18,7 +18,7 @@ To run the helper script:
 
 To run only the tests:
 ```bash
-mvn clean test -DbaseUrl=http://localhost:90/qa-catalogue/ -Dcatalogue-config=catalogues/lnb.json
+mvn clean test -DbaseUrl=http://localhost:90/qa-catalogue/ -Dcatalogue-config=catalogues/enb.json
 ```
 
 Parameters:
@@ -60,7 +60,7 @@ docker exec -t -i metadata-qa-marc /bin/bash -c 'rm -rf marc/_reports/qa-catalog
 
 # upload PICA records and library list 
 docker cp data/pica-with-holdings-info-1K.dat metadata-qa-marc:/opt/qa-catalogue/marc
-docker cp data/k10plus-libraries-by-unique-iln.txt metadata-qa-marc:/opt/qa-catalogue/marc
+docker cp data/marcxml-1K.xml.gz metadata-qa-marc:/opt/qa-catalogue/marc
 
 echo "run analyses"
 docker exec \
@@ -72,3 +72,8 @@ docker exec \
   --catalogue K10plus_pica_grouped \
   all
 ```
+
+## Data
+
+* data/pica-with-holdings-info-1K.dat: 1000 MARCXML records from the Estonian National Bibliography
+* data/marcxml-1K.xml.gz: 1000 PICA records from the K10plus catalogue

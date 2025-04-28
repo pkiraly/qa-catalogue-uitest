@@ -1,0 +1,22 @@
+{
+	"recordCount": 18585,
+	"libraryName": "Latvijas Nacionālā bibliotēka",
+	"libraryUrl": "https://lnb.lv/",
+	"completeness": {
+		"fieldGroups": [
+			{"id": 1, "label": "Control Fields", "count": 18585},
+			{"id": 3, "label": "Main Entry", "count": 15476}
+		],
+		"docTypes": {
+			"en": "by document types: all · Books · Continuing Resources · Computer Files",
+			"de": "Dokumenttyp: all · Books · Continuing Resources · Computer Files"
+		}
+	},
+	"validation": {
+		"definition": "Conformity with the bibliographic metadata scheme.",
+		"recordsWithoutIssues": {
+			"plain": "0 (0.00%)",
+			"exclude": "3,331 (17.92%)"
+		}
+	}
+}

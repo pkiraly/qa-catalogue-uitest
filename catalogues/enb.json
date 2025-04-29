@@ -1,22 +1,22 @@
 {
-	"recordCount": 18585,
-	"libraryName": "Latvijas Nacionālā bibliotēka",
-	"libraryUrl": "https://lnb.lv/",
+	"recordCount": 1000,
+	"libraryName": "Estonian National Bibliography",
+	"libraryUrl": "https://www.rara.ee/en/",
 	"completeness": {
 		"fieldGroups": [
-			{"id": 1, "label": "Control Fields", "count": 18585},
-			{"id": 3, "label": "Main Entry", "count": 15476}
+			{"id": 1, "label": "Control Fields", "count": 1000},
+			{"id": 3, "label": "Main Entry", "count": 768}
 		],
 		"docTypes": {
-			"en": "by document types: all · Books · Continuing Resources · Computer Files",
-			"de": "Dokumenttyp: all · Books · Continuing Resources · Computer Files"
+			"en": "by document types: all · Music",
+			"de": "Dokumenttyp: all · Music"
 		}
 	},
 	"validation": {
 		"definition": "Conformity with the bibliographic metadata scheme.",
 		"recordsWithoutIssues": {
 			"plain": "0 (0.00%)",
-			"exclude": "3,331 (17.92%)"
+			"exclude": "572 (57.20%)"
 		}
 	}
 }

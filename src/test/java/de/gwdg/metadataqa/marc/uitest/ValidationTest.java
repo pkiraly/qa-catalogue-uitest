@@ -15,7 +15,7 @@ public class ValidationTest extends QAPageTest {
     public void testNumeric() {
         driver.get(baseUrl + tab);
 
-        WebElement counter = driver.findElement(By.cssSelector(".header-info strong"));
+        WebElement counter = driver.findElement(By.cssSelector(".header-info strong:first-child"));
         assertEquals(catalogue.getRecordCount(), Integer.parseInt(counter.getText().replaceAll("\\D", "")));
 
         WebElement definition = driver.findElement(By.cssSelector(".metric-definition"));

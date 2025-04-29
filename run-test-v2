@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+#' Setup QA Catalogue and runs tests against MARC and PICA based analyses
+#' It stops when the tests fails
+set -ueo pipefail
+
+docker compose -f docker-compose-slim.yml up -d
+
+echo "run MARC analyses"
+QA_PARAMS="--marcVersion GENT --marcxml --emptyLargeCollectors"
+QA_PARAMS="${QA_PARAMS} --indexWithTokenizedField --indexFieldCounts --indexSubfieldCounts"
+docker exec -ti qa-catalogue ./qa-catalogue \
+  --params "${QA_PARAMS}" \
+  --mask '*.xml.gz' \
+  --catalogue "enb" --name "enb" \
+  --input marc \
+  --input-dir input \
+  --output marc/output \
+  --logs marc/logs \
+  --web-config "/opt/qa-catalogue/web-config/configuration.cnf" \
+  all
+
+mvn clean test \
+  -DbaseUrl=http://localhost:90/ \
+  -Dcatalogue-config=catalogues/enb.json
+
+echo "cleanup"
+# docker exec -ti qa-catalogue /bin/bash -c 'rm -rf marc/output/qa-catalogue/*'
+# docker exec -ti qa-catalogue /bin/bash -c 'rm -rf marc/logs/qa-catalogue/*'
+
+echo "run PICA analyses"
+QA_PARAMS="--schemaType PICA --marcFormat PICA_NORMALIZED --emptyLargeCollectors"
+QA_PARAMS="${QA_PARAMS} --groupBy 001@\$0 --groupListFile marc/k10plus-libraries-by-unique-iln.txt"
+QA_PARAMS="${QA_PARAMS} --ignorableFields 001@,001E,001L,001U,001U,001X,001X,002V,003C,003G,003Z,008G,017N,020F,027D,031B,037I,039V,042@,046G,046T,101@,101E,101U,102D,201E,201U,202D,1...,2..."
+QA_PARAMS="${QA_PARAMS} --allowableRecords base64:MDAyQC4wICF+ICJeTCIgJiYgMDAyQC4wICF+ICJeLi5baWt0Tl0iICYmICgwMDJALjAgIX4gIl4udiIgfHwgMDIxQS5hPykK"
+QA_PARAMS="${QA_PARAMS} --indexWithTokenizedField --indexFieldCounts --indexSubfieldCounts"
+QA_PARAMS="${QA_PARAMS} --solrForScoresUrl http://solr:8983/solr/k10plus_pica_grouped_validation"
+
+docker exec -ti qa-catalogue ./qa-catalogue \
+  --params "${QA_PARAMS}" \
+  --schema PICA \
+  --mask 'pica-with-holdings-info-1K.dat' \
+  --catalogue k10plus --name k10plus \
+  --input marc \
+  --input-dir input \
+  --output marc/output \
+  --logs marc/logs \
+  --web-config "/opt/qa-catalogue/web-config/configuration.cnf" \
+  all
+
+mvn clean test \
+  -DbaseUrl=http://localhost:90/ \
+  -Dcatalogue-config=catalogues/k10plus.json
+
+docker compose -f docker-compose-slim.yml down
+# docker rmi $(docker images ghcr.io/pkiraly/qa-catalogue-slim -q)
+# docker rmi $(docker images ghcr.io/pkiraly/qa-catalogue-web -q)
+
+sec=$SECONDS
+log "DONE in $(printf '%02d:%02d:%02d\n' $((sec/3600)) $((sec%3600/60)) $((sec%60)))"
